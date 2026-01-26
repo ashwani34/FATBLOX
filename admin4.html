@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 - Page Not Found</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --bg: #05080f; --sidebar: #0b1224; --card: #111827;
+            --accent: #00d4ff; --text-muted: #94a3b8; --border: #1f2937;
+            --error: #ff4444; --success: #10b981;
+            /* Rarity Colors */
+            --mythic: #ef4444; --legendary: #d946ef; --rare: #3b82f6; --common: #9ca3af;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; }
+        body { background: var(--bg); color: white; height: 100vh; overflow: hidden; }
+
+        /* --- 1. DECOY SCREEN --- */
+        #decoy-screen {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            background: var(--bg); z-index: 1000; text-align: center;
+        }
+        #decoy-screen h1 { font-size: 8rem; color: var(--error); opacity: 0.15; cursor: default; user-select: none; }
+        #decoy-screen p { font-size: 1.2rem; color: var(--text-muted); max-width: 400px; line-height: 1.6; }
+        .home-btn { 
+            margin-top: 30px; color: var(--accent); text-decoration: none; 
+            border: 1px solid var(--accent); padding: 12px 25px; border-radius: 8px; 
+            font-weight: 600; text-transform: uppercase; letter-spacing: 1px;
+        }
+        .home-btn:hover { background: var(--accent); color: #000; }
+
+
+        /* --- 2. ADMIN VAULT --- */
+        #admin-panel { display: none; height: 100vh; width: 100%; display: flex; }
+
+        /* Sidebar */
+        .sidebar { width: 260px; background: var(--sidebar); border-right: 1px solid var(--border); padding: 30px 20px; display: flex; flex-direction: column; }
+        .brand { font-size: 1.5rem; font-weight: 900; color: white; margin-bottom: 40px; letter-spacing: 1px; }
+        .brand span { color: var(--accent); }
+
+        .menu-item {
+            display: flex; align-items: center; gap: 12px; padding: 14px 16px;
+            color: var(--text-muted); cursor: pointer; border-radius: 10px;
+            margin-bottom: 8px; font-weight: 600; transition: 0.3s;
+        }
+        .menu-item:hover, .menu-item.active { background: rgba(0, 212, 255, 0.1); color: var(--accent); }
+        .menu-item.master-btn { background: rgba(255,255,255,0.05); color: white; margin-bottom: 20px; border: 1px solid var(--border); }
+
+        /* Main Content */
+        .main-content { flex: 1; padding: 40px; overflow-y: auto; }
+        .top-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; }
+
+        /* Filter Tabs */
+        .filter-group { background: var(--card); border: 1px solid var(--border); border-radius: 8px; display: flex; overflow: hidden; }
+        .filter-btn { padding: 10px 18px; border: none; background: transparent; color: var(--text-muted); font-weight: 700; cursor: pointer; font-size: 0.75rem; border-right: 1px solid var(--border); }
+        .filter-btn.active { background: var(--accent); color: #000; }
+
+        .search-box { background: var(--card); border: 1px solid var(--border); padding: 10px 15px; border-radius: 8px; display: flex; align-items: center; gap: 10px; width: 200px; margin-left: 15px; }
+        .search-box input { background: transparent; border: none; color: white; outline: none; width: 100%; }
+
+        /* Table */
+        .table-wrapper { background: var(--card); border-radius: 16px; border: 1px solid var(--border); overflow: hidden; }
+        table { width: 100%; border-collapse: collapse; }
+        th { text-align: left; padding: 18px; color: var(--text-muted); font-size: 0.8rem; text-transform: uppercase; background: rgba(255,255,255,0.02); }
+        td { padding: 18px; border-bottom: 1px solid var(--border); font-size: 0.9rem; }
+
+        /* Status Checkbox */
+        .check-box { width: 22px; height: 22px; border: 2px solid var(--text-muted); border-radius: 6px; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .is-imp { background: rgba(16, 185, 129, 0.1); }
+        .is-imp .check-box { background: var(--success); border-color: var(--success); }
+        .is-imp .check-box::after { content: '✔'; color: #000; font-weight: bold; font-size: 12px; }
+
+        .badge { padding: 4px 10px; border-radius: 6px; font-size: 0.75rem; font-weight: 800; text-transform: uppercase; }
+        .b-giveaway { background: rgba(255, 68, 68, 0.2); color: #ff4444; }
+        .b-spin { background: rgba(0, 212, 255, 0.2); color: var(--accent); }
+        .b-quiz { background: rgba(217, 70, 239, 0.2); color: #d946ef; }
+    </style>
+</head>
+<body>
+
+    <div id="decoy-screen">
+        <h1 onclick="triggerSecurity()">404</h1>
+        <p>The requested URL was not found on this server.</p>
+        <a href="index.html" class="home-btn">Return to Safety</a>
+    </div>
+
+    <div id="admin-panel">
+        <nav class="sidebar">
+            <div class="brand">FATBLOX<span>ADMIN</span></div>
+            <div class="menu-item master-btn active" onclick="loadTab('MASTER', this)"><i class="fas fa-globe"></i> MASTER LOG</div>
+            <div class="menu-item" onclick="loadTab('GIVEAWAY', this)"><i class="fas fa-gift"></i> Giveaways</div>
+            <div class="menu-item" onclick="loadTab('SPIN', this)"><i class="fas fa-dice"></i> Spin Wins</div>
+            <div class="menu-item" onclick="loadTab('QUIZ', this)"><i class="fas fa-check-circle"></i> Quiz Data</div>
+            <div class="menu-item" style="margin-top:auto; color:var(--error)" onclick="location.reload()"><i class="fas fa-power-off"></i> Logout</div>
+        </nav>
+
+        <main class="main-content">
+            <div class="top-bar">
+                <h2 id="page-title">Master Log</h2>
+                <div style="display: flex; align-items: center;">
+                    <div class="filter-group">
+                        <button class="filter-btn" onclick="setFilter('pending', this)">PENDING</button>
+                        <button class="filter-btn" onclick="setFilter('important', this)">IMPORTANT</button>
+                        <button class="filter-btn active" onclick="setFilter('all', this)">SHOW ALL</button>
+                    </div>
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" id="searchInput" placeholder="User..." onkeyup="render()">
+                    </div>
+                    <button onclick="fetchData()" style="margin-left:15px; background:var(--accent); border:none; padding:10px 15px; border-radius:8px; cursor:pointer; font-weight:bold;">SYNC</button>
+                </div>
+            </div>
+
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Save</th>
+                            <th>Type</th>
+                            <th>Username</th>
+                            <th>Details / Data</th>
+                            <th>Date</th>
+                        </tr>
+                    </thead>
+                    <tbody id="table-body"></tbody>
+                </table>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const API = "https://script.google.com/macros/s/AKfycbxUlLLwffQ1yADh_Fg3xLMNhvL4aSvQi43Qy1h9VKfgHDkDhVdAlwEFoMDmwNnIR7OdcA/exec";
+        let rawData = [];
+        let currentTab = 'MASTER';
+        let viewMode = 'all';
+        let clickCount = 0;
+
+        function triggerSecurity() {
+            clickCount++;
+            if (clickCount >= 3) {
+                document.getElementById('decoy-screen').style.display = 'none';
+                document.getElementById('admin-panel').style.display = 'flex';
+                fetchData();
+            }
+        }
+
+        async function fetchData() {
+            const btn = document.querySelector('button[onclick="fetchData()"]');
+            btn.innerHTML = '<i class="fas fa-sync fa-spin"></i>';
+            try {
+                const response = await fetch(API);
+                rawData = await response.json();
+                render();
+            } catch (e) {
+                alert("Error fetching data. Check Google Script Permissions.");
+            }
+            btn.innerHTML = 'SYNC';
+        }
+
+        function loadTab(tab, el) {
+            currentTab = tab;
+            document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
+            el.classList.add('active');
+            document.getElementById('page-title').innerText = tab + (tab === 'MASTER' ? " LOG" : " RECORDS");
+            render();
+        }
+
+        function setFilter(mode, el) {
+            viewMode = mode;
+            document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+            el.classList.add('active');
+            render();
+        }
+
+        function toggleImp(id) {
+            const key = `imp_${id}`;
+            const state = localStorage.getItem(key) === 'true';
+            localStorage.setItem(key, !state);
+            render();
+        }
+
+        function render() {
+            const tbody = document.getElementById('table-body');
+            const search = document.getElementById('searchInput').value.toLowerCase();
+            tbody.innerHTML = '';
+
+            // 1. Filter by Tab Type
+            let filtered = currentTab === 'MASTER' ? rawData : rawData.filter(x => x.Type === currentTab);
+
+            // 2. Filter by Search
+            filtered = filtered.filter(x => x.Username.toLowerCase().includes(search));
+
+            filtered.forEach((row, index) => {
+                const rowId = row.Username + row.Timestamp; // Unique string for local storage
+                const isImportant = localStorage.getItem(`imp_${rowId}`) === 'true';
+
+                // 3. Filter by ViewMode (Pending / Important)
+                if (viewMode === 'pending' && isImportant) return;
+                if (viewMode === 'important' && !isImportant) return;
+
+                const tr = document.createElement('tr');
+                if (isImportant) tr.classList.add('is-imp');
+
+                tr.innerHTML = `
+                    <td><div class="check-box" onclick="toggleImp('${rowId}')"></div></td>
+                    <td><span class="badge b-${row.Type.toLowerCase()}">${row.Type}</span></td>
+                    <td><b>${row.Username}</b></td>
+                    <td>${row.Detail || 'No extra data'}</td>
+                    <td style="opacity:0.5; font-size:0.8rem">${row.Timestamp || 'N/A'}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+    </script>
+</body>
+</html>
