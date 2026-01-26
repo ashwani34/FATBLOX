@@ -2,17 +2,24 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>FATBLOX57 | Quiz</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verification Quiz | FATBLOX57</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
-        /* Sidebar Colors */
-        :root { --bg: #f4f7fe; --sidebar: #0b1224; --text: #ffffff; --accent: #00d4ff; --border: #1f2937; }
-        
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; transition: 0.3s; }
-        body { display: flex; background: var(--bg); min-height: 100vh; }
+        :root {
+            --bg: #05080f; --sidebar: #0b1224; --text: #ffffff;
+            --accent: #00d4ff; --card: #111827; --border: #1f2937;
+        }
+        [data-theme="light"] {
+            --bg: #f3f4f6; --sidebar: #ffffff; --text: #111827;
+            --accent: #0052cc; --card: #ffffff; --border: #e5e7eb;
+        }
 
-        /* STANDARDIZED SIDEBAR */
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; transition: 0.3s; }
+        body { background: var(--bg); color: var(--text); display: flex; min-height: 100vh; overflow-x: hidden; }
+
+        /* --- SIDEBAR --- */
         nav.sidebar { 
             width: 260px; background: var(--sidebar); height: 100vh; 
             position: fixed; padding: 40px 20px; border-right: 1px solid var(--border);
@@ -24,106 +31,162 @@
             margin-bottom: 8px; border-radius: 12px; display: flex; align-items: center; gap: 10px; font-weight: 600; opacity: 0.8;
         }
         .nav-link:hover, .nav-link.active { background: var(--accent); color: white; opacity: 1; }
-
-        /* FIXED MAIN MARGIN 260px */
-        main { margin-left: 260px; padding: 50px; width: 100%; }
         
-        .card { background: white; padding: 40px; border-radius: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.05); max-width: 600px; }
-        label { font-weight: 600; display: block; margin-top: 15px; color: #333; }
-        input { width: 100%; padding: 12px; margin-top: 8px; border: 1px solid #ddd; border-radius: 10px; outline: none; }
-        #submitBtn { background: #0052cc; color: white; padding: 15px; border: none; border-radius: 12px; width: 100%; cursor: pointer; font-weight: bold; margin-top: 25px; }
-    
-    /* This pushes the icon to the bottom corner */
-nav.sidebar {
-    display: flex;
-    flex-direction: column;
-}
+        .sidebar-footer { margin-top: auto; padding: 20px 0; display: flex; align-items: center; gap: 10px; border-top: 1px solid var(--border); }
+        .theme-toggle { background: var(--border); border: none; padding: 10px; border-radius: 10px; color: var(--text); cursor: pointer; font-size: 1.2rem; flex: 1; }
 
-.sidebar-footer {
-    margin-top: auto; /* This is the "magic" that pushes it to the bottom */
-    padding: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: flex-start; /* Keeps it in the corner */
-}
+        /* --- CONTENT --- */
+        main { margin-left: 260px; padding: 40px; width: 100%; display: flex; justify-content: center; align-items: flex-start; }
+        .quiz-container { max-width: 600px; width: 100%; background: var(--card); border: 1px solid var(--border); border-radius: 25px; padding: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
+        
+        .quiz-header { text-align: center; margin-bottom: 30px; }
+        .quiz-header h1 { font-size: 2rem; color: var(--accent); margin-bottom: 10px; }
+        
+        .input-group { margin-bottom: 20px; }
+        label { display: block; margin-bottom: 8px; font-weight: 600; font-size: 0.9rem; opacity: 0.8; }
+        input, select { 
+            width: 100%; padding: 14px; border-radius: 12px; border: 1px solid var(--border);
+            background: rgba(255,255,255,0.05); color: var(--text); font-size: 1rem; outline: none;
+        }
+        input:focus, select:focus { border-color: var(--accent); background: rgba(0,212,255,0.05); }
 
-.profile-link {
-    color: var(--text);
-    font-size: 1.8rem;
-    opacity: 0.3; /* Low opacity so it looks professional/not sus */
-    text-decoration: none;
-    transition: 0.3s;
-}
+        .submit-btn {
+            width: 100%; background: var(--accent); color: white; border: none; 
+            padding: 16px; border-radius: 12px; font-size: 1.1rem; font-weight: 900; 
+            cursor: pointer; text-transform: uppercase; margin-top: 10px;
+        }
+        .submit-btn:hover { opacity: 0.9; transform: translateY(-2px); }
 
-.profile-link:hover {
-    opacity: 1;
-    color: var(--accent);
-}
-    
+        /* --- MOBILE --- */
+        .menu-btn { display: none; position: fixed; top: 15px; left: 15px; z-index: 1100; background: var(--accent); color: white; border: none; padding: 12px; border-radius: 8px; cursor: pointer; }
+        #overlay { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 999; }
+
+        @media (max-width: 768px) {
+            nav.sidebar { transform: translateX(-100%); width: 280px; }
+            nav.sidebar.open { transform: translateX(0); }
+            main { margin-left: 0; padding: 80px 20px; }
+            .menu-btn { display: block; }
+            #overlay.active { display: block; }
+        }
     </style>
 </head>
-<body>
-    <nav class="sidebar">
-    <div class="logo">FATBLOX57</div>
-    
-    <a href="index.html" class="nav-link">Home</a>
-    <a href="quiz.html" class="nav-link">Verification</a>
-    <a href="giveaway.html" class="nav-link">Giveaway</a>
-    <a href="spin.html" class="nav-link">Daily Spin</a>
-    <a href="leaderboard.html" class="nav-link">Leaderboard</a>
+<body data-theme="dark">
 
-    <div class="sidebar-footer">
-        <a href="https://edupulses.github.io/EduPulses/about.html" class="profile-link">
-            <i class="fas fa-user-circle"></i>
-        </a>
-    </div>
-</nav>
+    <button class="menu-btn" onclick="toggleMenu()"><i class="fas fa-bars"></i></button>
+    <div id="overlay" onclick="toggleMenu()"></div>
+
+    <nav class="sidebar" id="sidebar">
+        <div class="logo">FATBLOX57</div>
+        <a href="index.html" class="nav-link">Home</a>
+        <a href="quiz.html" class="nav-link active">Verification</a>
+        <a href="giveaway.html" class="nav-link">Giveaway</a>
+        <a href="spin.html" class="nav-link">Daily Spin</a>
+        <a href="leaderboard.html" class="nav-link">Leaderboard</a>
+
+        <div class="sidebar-footer">
+            <button class="theme-toggle" onclick="toggleTheme()">
+                <span id="themeIcon">🌙</span>
+            </button>
+            <div style="opacity: 0.3; cursor: pointer; font-size: 1.8rem; padding: 10px;">
+                <i class="fas fa-user-circle"></i>
+            </div>
+        </div>
+    </nav>
+
     <main>
-        <h1 style="color: #0b1224; margin-bottom: 20px;">Verification Quiz</h1>
-        <div class="card">
+        <div class="quiz-container">
+            <div class="quiz-header">
+                <i class="fas fa-user-check" style="font-size: 3rem; color: var(--accent); margin-bottom: 15px;"></i>
+                <h1>Player Profile</h1>
+                <p style="opacity: 0.6;">Tell us about yourself to complete verification!</p>
+            </div>
+
             <form id="quizForm">
-                <label>Age</label><input type="number" id="age" required>
-                <label>Favorite Game</label><input type="text" id="game" required>
-                <label>Roblox Username</label><input type="text" id="user" required>
-                <button type="submit" id="submitBtn">SUBMIT TO QUIZ CLOUD</button>
+                <div class="input-group">
+                    <label>ROBLOX USERNAME</label>
+                    <input type="text" id="user" placeholder="Enter your username" required>
+                </div>
+
+                <div class="input-group">
+                    <label>YOUR AGE</label>
+                    <input type="number" id="age" placeholder="How old are you?" required min="1" max="100">
+                </div>
+
+                <div class="input-group">
+                    <label>PRIMARY GAME PLAYED</label>
+                    <select id="game" required>
+                        <option value="" disabled selected>Select your game...</option>
+                        <option value="Blox Fruits">Blox Fruits</option>
+                        <option value="Free Fire">Free Fire</option>
+                        <option value="Bedwars">Bedwars</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+
+                <div class="input-group">
+                    <label>FAVORITE FRUIT</label>
+                    <input type="text" id="fruit" placeholder="e.g. Kitsune, Leopard, etc.">
+                </div>
+
+                <button type="submit" class="submit-btn" id="submitBtn">VERIFY & SUBMIT</button>
             </form>
         </div>
     </main>
-    <script>
-    document.getElementById('quizForm').onsubmit = function(e) {
-        e.preventDefault();
-        const btn = document.getElementById('submitBtn');
-        
-        // Change text so you know it's working
-        btn.innerHTML = "Syncing... ⏳";
-        btn.disabled = true;
 
-        // Package the data for your Google Sheet
-        const data = { 
-            Type: "QUIZ",
-            Username: document.getElementById('user').value, 
-            Detail: "Game: " + document.getElementById('game').value + " | Age: " + document.getElementById('age').value
+    <script>
+        function toggleMenu() {
+            document.getElementById('sidebar').classList.toggle('open');
+            document.getElementById('overlay').classList.toggle('active');
+        }
+
+        function toggleTheme() {
+            const body = document.body;
+            const newTheme = body.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+            body.setAttribute('data-theme', newTheme);
+            document.getElementById('themeIcon').innerText = newTheme === 'dark' ? '🌙' : '☀️';
+            localStorage.setItem('theme', newTheme);
+        }
+
+        window.onload = () => {
+            const saved = localStorage.getItem('theme') || 'dark';
+            document.body.setAttribute('data-theme', saved);
+            document.getElementById('themeIcon').innerText = saved === 'dark' ? '🌙' : '☀️';
         };
 
-        // Send to your Google URL
-        fetch('https://script.google.com/macros/s/AKfycbxC5HR7w6TmgOhshQaiVarWD4Vi62AJRhfQYLal67bnWPBixIOo01agUTVha-g0As39eQ/exec', {
-            method: 'POST', 
-            mode: 'no-cors', // This prevents the Google block
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(data)
-        })
-        .then(() => {
-            alert("Success! Data sent to Google Sheets.");
-            this.reset();
-            btn.innerHTML = "SUBMIT TO CLOUD"; 
-            btn.disabled = false;
-        })
-        .catch(error => {
-            alert("Error: " + error);
-            btn.disabled = false;
-            btn.innerHTML = "SUBMIT TO CLOUD";
-        });
-    };
-</script>
+        // --- SUBMISSION LOGIC ---
+        document.getElementById('quizForm').onsubmit = function(e) {
+            e.preventDefault();
+            const btn = document.getElementById('submitBtn');
+            btn.innerHTML = "Syncing... ⏳";
+            btn.disabled = true;
+
+            const data = { 
+                Type: "QUIZ",
+                Username: document.getElementById('user').value, 
+                Detail: "Age: " + document.getElementById('age').value + 
+                        " | Game: " + document.getElementById('game').value + 
+                        " | Fruit: " + (document.getElementById('fruit').value || "None")
+            };
+
+            fetch('https://script.google.com/macros/s/AKfycbxC5HR7w6TmgOhshQaiVarWD4Vi62AJRhfQYLal67bnWPBixIOo01agUTVha-g0As39eQ/exec', {
+                method: 'POST', 
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(data)
+            })
+            .then(() => {
+                alert("Verification Successful! Data sent to cloud.");
+                this.reset();
+                btn.innerHTML = "VERIFY & SUBMIT";
+                btn.disabled = false;
+                window.location.href = "index.html";
+            })
+            .catch(() => {
+                alert("Error connecting. Please try again.");
+                btn.innerHTML = "VERIFY & SUBMIT";
+                btn.disabled = false;
+            });
+        };
+    </script>
 </body>
 </html>
