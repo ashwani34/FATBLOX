@@ -4,15 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FATBLOX57 | Official Hub</title>
+    
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#0b1224">
+    <link rel="apple-touch-icon" href="icon-192.png">
+
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
-    <link rel="manifest" href="/FATBLOX/manifest.json">
+    
+    <script>
+      if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('sw.js')
+            .then(reg => console.log('SW Registered!', reg))
+            .catch(err => console.log('SW Error:', err));
+        });
+      }
+    </script>
 
-<script>
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/FATBLOX/sw.js');
-  }
-</script>
     <style>
         :root {
             --bg: #05080f; --sidebar: #0b1224; --text: #ffffff;
@@ -27,7 +36,7 @@
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Outfit', sans-serif; transition: 0.3s; }
         body { background: var(--bg); color: var(--text); display: flex; min-height: 100vh; overflow-x: hidden; }
 
-        /* Sidebar - Fixed ID to match JS */
+        /* Sidebar */
         nav.sidebar { 
             width: 260px; background: var(--sidebar); height: 100vh; 
             position: fixed; padding: 40px 20px; border-right: 1px solid var(--border);
@@ -52,9 +61,37 @@
             background: linear-gradient(rgba(0,0,0,0.6), rgba(0,0,0,0.6)), url('https://tr.rbxcdn.com/c6c8e343166b2df154e1744158933b91/768/432/Image/Png');
             background-size: cover; background-position: center; border-radius: 25px; padding: 60px 40px; 
             color: white; margin-bottom: 30px; border: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
         .hero h1 { font-size: 3rem; font-weight: 900; margin-bottom: 10px; text-transform: uppercase; line-height: 1.1; }
-        
+        .hero p { margin-bottom: 25px; } /* Added space below text */
+
+        /* --- DOWNLOAD BUTTON STYLE (Inside Hero) --- */
+        #installBtn {
+            display: none; /* Hidden until checks pass */
+            width: fit-content;
+            background: linear-gradient(90deg, var(--accent), #008cff);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            font-weight: 900;
+            border-radius: 50px;
+            cursor: pointer;
+            margin-top: 10px; /* Space from text */
+            box-shadow: 0 0 20px rgba(0, 212, 255, 0.4);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(0, 212, 255, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(0, 212, 255, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 212, 255, 0); }
+        }
+
         .social-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 30px; }
         .social-card { padding: 18px; border-radius: 15px; text-decoration: none; color: white; display: flex; align-items: center; justify-content: center; gap: 10px; font-weight: 800; font-size: 0.9rem; }
         .yt { background: var(--yt-red); }
@@ -84,6 +121,7 @@
             .hero h1 { font-size: 2.2rem; }
             .hero { padding: 40px 25px; }
             .logo { margin-bottom: 20px; }
+            #installBtn { width: 100%; margin-top: 15px; } /* Full width on mobile */
         }
     </style>
 </head>
@@ -115,6 +153,8 @@
         <div class="hero">
             <h1>Welcome to the Hub</h1>
             <p>Gaming meets pro player. Discover gameplay, tips, and tutorials.</p>
+            
+            <button id="installBtn"><i class="fas fa-download"></i> &nbsp; Install FATBLOX App</button>
         </div>
 
         <div class="social-grid">
@@ -155,6 +195,31 @@
     </main>
 
     <script>
+        // --- 4. APP INSTALL LOGIC ---
+        let deferredPrompt;
+        const installBtn = document.getElementById('installBtn');
+
+        // Logic for Android & PC (Chrome/Edge)
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            installBtn.style.display = 'block'; // Show button when ready
+        });
+
+        installBtn.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    installBtn.style.display = 'none';
+                }
+                deferredPrompt = null;
+            } else {
+                // If clicked on iOS or when already installed
+                alert("To install: Click the 'Share' icon (Box with arrow) and select 'Add to Home Screen'!");
+            }
+        });
+
         // Toggle Sidebar & Overlay
         function toggleMenu() { 
             document.getElementById('sidebar').classList.toggle('open'); 
@@ -175,8 +240,14 @@
             const saved = localStorage.getItem('theme') || 'dark';
             document.body.setAttribute('data-theme', saved);
             document.getElementById('themeIcon').innerText = saved === 'dark' ? '🌙' : '☀️';
+            
+            // iOS manual check to show button
+            const isIos = /iphone|ipad|ipod/.test(window.navigator.userAgent.toLowerCase());
+            const isInStandaloneMode = ('standalone' in window.navigator) && (window.navigator.standalone);
+            if (isIos && !isInStandaloneMode) {
+                installBtn.style.display = 'block'; 
+            }
         };
     </script>
 </body>
 </html>
-
